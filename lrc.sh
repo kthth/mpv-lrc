@@ -1,37 +1,25 @@
 #!/bin/sh
+# are there mpv hooks that can run this script when song changes?
+mediafile=$(printf %s\\n '{ "command": ["get_property", "path"] }' | socat - UNIX-CONNECT:/tmp/mpv-socket | jq -r .data) || exit 1
+mediadir=$(printf %s\\n '{ "command": ["get_property", "working-directory"] }' | socat - UNIX-CONNECT:/tmp/mpv-socket | jq -r .data) || exit 1
 
-lrc_path=$(printf %s\\n '{ "command": ["expand-properties", "normalize-path", "${path}"] }' | socat - UNIX-CONNECT:/tmp/mpv-socket) || exit 1
-
-lrc_path=$(printf %s "$lrc_path" | jq -r .data)
+case $mediafile in
+	/*) mediapath=$(printf %s "$mediafile" );;
+	*) mediapath=$(printf %s/%s "$mediadir" "$mediafile" );;
+esac
 case $lrc_path in
     */'(unavailable)') exit 1 ;;
 esac
-
-lrc_path=${lrc_path%.*}.lrc
-
-[ -e "$lrc_path" ] && exec $EDITOR "$lrc_path"
-[ -e "${lrc_path%.*}.ja.lrc" ] && exec $EDITOR "${lrc_path%.*}.ja.lrc"
-
-metadata=$(printf %s\\n '{ "command": ["get_property", "metadata"] }' \
-    | socat - /tmp/mpv-socket | jq .data)
-# The keys are lower case in ID3 tags and upper case in Vorbis comments.
-artist=$(printf %s "$metadata" | jq -r 'if has("artist") then .artist else .ARTIST end')
-title=$(printf %s "$metadata" | jq -r 'if has("title") then .title else .TITLE end')
-
-query="$artist $title"
-
-# grep -P can be unavailable
-if printf %s "$query" | perl -nC -e 'exit(not /[\p{Hiragana}\p{Katakana}\p{Han}]/)'; then
-    query="$query 歌詞"
+lrc_path=${mediapath%.*}.lrc
+if [ -e "$lrc_path" ]; then
+    exec $EDITOR "$lrc_path"
 else
-    query="$query lyrics"
+    python3 ~/src/dev/kimono/lrcmaker.py "$mediapath"
+    exec $EDITOR + "$lrc_path"
 fi
 
-case ${BROWSER:=chromium} in
-    *chrom*) query="? $query" ;;
-    firefox) BROWSER="$BROWSER --search"
-esac
-
-$BROWSER "$query" 2>/dev/null &
-
-exec $EDITOR + "$lrc_path"
+#metadata=$(printf %s\\n '{ "command": ["get_property", "metadata"] }' \
+#    | socat - /tmp/mpv-socket | jq .data)
+# The keys are lower case in ID3 tags and upper case in Vorbis comments.
+#artist=$(printf %s "$metadata" | jq -r 'if has("artist") then .artist else .ARTIST end')
+#title=$(printf %s "$metadata" | jq -r 'if has("title") then .title else .TITLE end')
