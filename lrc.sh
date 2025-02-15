@@ -12,10 +12,10 @@ case $lrc_path in
 esac
 lrc_path=${mediapath%.*}.lrc
 if [ -e "$lrc_path" ]; then
-  exec $EDITOR "$lrc_path"
+  exec nvim "$lrc_path" +"/[00:00"
 else
   python3 ~/src/dev/kimono/lrcmaker.py "$mediapath"
-  exec $EDITOR + "$lrc_path"
+  exec nvim + "$lrc_path" +"/[00:00"
 fi
 
 #metadata=$(printf %s\\n '{ "command": ["get_property", "metadata"] }' \
