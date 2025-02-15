@@ -24,6 +24,10 @@ nnoremap <buffer> <F7> <Cmd>let currentTimeFormatted = FormatCurrentTime()
   \ \| let matchPattern = match(currentLine, timePattern)
   \ \| call ReplaceTime(matchPattern, currentLine, currentTimeFormatted)<CR>
   \ <CR>jk0
+nnoremap <buffer> <F4> <Cmd>let currentTimeFormatted = FormatCurrentTime()
+  \ \| let currentLine = line('.')
+  \ \| call append(currentLine, currentTimeFormatted)
+  \ \| call cursor(currentLine+2,0)<CR>
 nnoremap <buffer> <F8> <Cmd>silent call system('echo seek -2 \| socat - /tmp/mpv-socket')
   \ \| echom FormatCurrentTime()<CR>
 nnoremap <buffer> <silent> <F9> <Cmd>silent call system('echo ''{ "command": ["cycle", "pause"] }'' \| socat - /tmp/mpv-socket')<CR>
