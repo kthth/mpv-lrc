@@ -9,10 +9,16 @@ function! ReplaceTime(matched, line, time)
   endif
 endfunction
 
-nnoremap <buffer> <F7> <Cmd>let time_pos = json_decode(system('echo ''{ "command": ["get_property", "time-pos"] }'' \| socat - /tmp/mpv-socket')).data - 0.3
-  \ \| let m = floor(time_pos / 60)
-  \ \| let s = time_pos - (m * 60)
-  \ \| let currentTimeFormatted = printf('[%02.0f:%05.2f]', m, s)
+function! FormatCurrentTime()
+  let systemcall = system('echo ''{ "command": ["get_property", "time-pos"] }'' | socat - /tmp/mpv-socket')
+  let time_pos = json_decode(systemcall).data - 0.3
+  let m = floor(time_pos / 60)
+  let s = time_pos - (m * 60)
+  let currentTimeFormatted = printf('[%02.0f:%05.2f]', m, s)
+  return currentTimeFormatted
+endfunction
+
+nnoremap <buffer> <F7> <Cmd>let currentTimeFormatted = FormatCurrentTime()
   \ \| let currentLine = getline('.')
   \ \| let timePattern = '\[\d\{2}:\d\{2}.\d\{2,3}\]'
   \ \| let matchPattern = match(currentLine, timePattern)
