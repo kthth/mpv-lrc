@@ -11,13 +11,10 @@ case $lrc_path in
   */'(unavailable)') exit 1 ;;
 esac
 lrc_path=${mediapath%.*}.lrc
-if [ -e "$lrc_path" ]; then
-  exec nvim "$lrc_path" +"/[00:00"
-else
+if [ ! -e "$lrc_path" ]; then
   python3 ~/src/dev/kimono/lrcmaker.py "$mediapath"
-  exec nvim + "$lrc_path" +"/[00:00"
 fi
-
+exec nvim --listen /tmp/nvim-socket "$lrc_path" + "/[00:00"
 #metadata=$(printf %s\\n '{ "command": ["get_property", "metadata"] }' \
 #    | socat - /tmp/mpv-socket | jq .data)
 # The keys are lower case in ID3 tags and upper case in Vorbis comments.
