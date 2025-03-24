@@ -18,18 +18,18 @@ function! FormatCurrentTime()
   return currentTimeFormatted
 endfunction
 
-nnoremap <buffer> <F7> <Cmd>let currentTimeFormatted = FormatCurrentTime()
+nnoremap <buffer> <Right> <Cmd>let currentTimeFormatted = FormatCurrentTime()
   \ \| let currentLine = getline('.')
   \ \| let timePattern = '\[\d\{2}:\d\{2}.\d\{2,3}\]'
   \ \| let matchPattern = match(currentLine, timePattern)
   \ \| call ReplaceTime(matchPattern, currentLine, currentTimeFormatted)<CR>
   \ <CR>jk0
-nnoremap <buffer> <F4> <Cmd>let currentTimeFormatted = FormatCurrentTime()
+nnoremap <buffer> <Down> <Cmd>let currentTimeFormatted = FormatCurrentTime()
   \ \| call append(line('.')-1, currentTimeFormatted)
   \ \| call cursor(line('.'),0)<CR>
-nnoremap <buffer> <F8> <Cmd>silent call system('echo seek -2 \| socat - /tmp/mpv-socket')
+nnoremap <buffer> <Left> <Cmd>silent call system('echo seek -2 \| socat - /tmp/mpv-socket')
   \ \| echom FormatCurrentTime()<CR>
-nnoremap <buffer> <silent> <F9> <Cmd>silent call system('echo ''{ "command": ["cycle", "pause"] }'' \| socat - /tmp/mpv-socket')<CR>
+nnoremap <buffer> <silent> <Up> <Cmd>silent call system('echo ''{ "command": ["cycle", "pause"] }'' \| socat - /tmp/mpv-socket')<CR>
 " add a function that gets subtitle delay and writes that into the header as offset
 " https://stackoverflow.com/posts/55447571/edit
 nnoremap <buffer> <F10> <Cmd>let sub_delay = json_decode(system('echo ''{ "command": ["get_property", "sub-delay"] }'' \| socat - /tmp/mpv-socket')).data
@@ -42,6 +42,6 @@ nnoremap <buffer> <F6> <Cmd>let sub_start = json_decode(system('echo ''{ "comman
   \ \| call search(printf('[%02.0f:%05.2f', m, s))
   \ \| <CR>
 nnoremap <buffer> <F5> -y%k"_Dpb<C-x>2j0
-imap <buffer> <F7> <C-g>u<Esc><F7>
-imap <buffer> <F8> <Esc><F8>
-imap <buffer> <F9> <Esc><F9>
+imap <buffer> <Right> <C-g>u<Esc><Right>
+imap <buffer> <Left> <Esc><Left>
+imap <buffer> <Up> <Esc><Up>
