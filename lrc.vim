@@ -25,9 +25,8 @@ nnoremap <buffer> <F7> <Cmd>let currentTimeFormatted = FormatCurrentTime()
   \ \| call ReplaceTime(matchPattern, currentLine, currentTimeFormatted)<CR>
   \ <CR>jk0
 nnoremap <buffer> <F4> <Cmd>let currentTimeFormatted = FormatCurrentTime()
-  \ \| let currentLine = line('.')
-  \ \| call append(currentLine, currentTimeFormatted)
-  \ \| call cursor(currentLine+2,0)<CR>
+  \ \| call append(line('.')-1, currentTimeFormatted)
+  \ \| call cursor(line('.'),0)<CR>
 nnoremap <buffer> <F8> <Cmd>silent call system('echo seek -2 \| socat - /tmp/mpv-socket')
   \ \| echom FormatCurrentTime()<CR>
 nnoremap <buffer> <silent> <F9> <Cmd>silent call system('echo ''{ "command": ["cycle", "pause"] }'' \| socat - /tmp/mpv-socket')<CR>
@@ -45,3 +44,4 @@ nnoremap <buffer> <F6> <Cmd>let sub_start = json_decode(system('echo ''{ "comman
 nnoremap <buffer> <F5> -y%k"_Dpb<C-x>2j0
 imap <buffer> <F7> <C-g>u<Esc><F7>
 imap <buffer> <F8> <Esc><F8>
+imap <buffer> <F9> <Esc><F9>
